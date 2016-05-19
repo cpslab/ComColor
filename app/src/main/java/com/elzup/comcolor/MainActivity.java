@@ -13,43 +13,55 @@ import android.widget.TextView;
 
 import java.nio.charset.Charset;
 
+import icepick.Icepick;
+import icepick.State;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
     // 保持する色, 今は String
-    String mColor = "none";
+    @State
+    String mColor;
     NfcAdapter mNfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView text = (TextView)findViewById(R.id.nfcTextView);
+        TextView text = (TextView) findViewById(R.id.nfcTextView);
         //インテントの取得
         Intent intent = getIntent();
         //NDEF対応カードの検出か確認
         String action = intent.getAction();
 
-        if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)){
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
             Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage[] msgs = new NdefMessage[raws.length];
 
             String message = "";
-            for(int i=0;i<raws.length;i++){
-                msgs[i] = (NdefMessage)raws[i];
-                for(NdefRecord record : msgs[i].getRecords()) {
+            for (int i = 0; i < raws.length; i++) {
+                msgs[i] = (NdefMessage) raws[i];
+                for (NdefRecord record : msgs[i].getRecords()) {
                     byte[] payload = record.getPayload();
                     byte status = payload[0];
                     int languageCodeLength = status & 0x3F;
 //                    boolean encodeUtf8 = ((status & 0x80) == 0);
 //                    String textEncoding = encodeUtf8 ;
-                    message = new String(payload,languageCodeLength + 1,payload.length - languageCodeLength -1);
+                    message = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
                 }
-            }text.setText(message);
+            }
+            text.setText(message);
         }
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mNfcAdapter.setNdefPushMessageCallback(this, this);
         this.updateColorText();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Override
@@ -86,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             // Beam 受信
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra( NfcAdapter.EXTRA_NDEF_MESSAGES);
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage msg = (NdefMessage) rawMsgs[0];
             String color = new String(msg.getRecords()[0].getPayload());
             mColor += color;
