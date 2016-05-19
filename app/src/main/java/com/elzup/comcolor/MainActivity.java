@@ -15,6 +15,10 @@ import java.nio.charset.Charset;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
+    // 保持する色, 今は String
+    String mColor = "none";
+    NfcAdapter mNfcAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,29 +49,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mNfcAdapter.setNdefPushMessageCallback(this, this);
+        this.updateColorText();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset_button:
-                TextView colorText = (TextView) findViewById(R.id.color_text);
-                colorText.setText("白");
+                String resetColor = "white";
+                mColor = resetColor;
+                this.updateColorText();
                 break;
         }
     }
 
-    NfcAdapter mNfcAdapter;
-
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        String string1 = "test1";
-        String string2 = "test2";
-        byte[] bytes1 = string1.getBytes(Charset.forName("US-ASCII"));
-        byte[] bytes2 = string2.getBytes(Charset.forName("US-ASCII"));
+        // mColor (String) の送信
+        byte[] bytes1 = mColor.getBytes(Charset.forName("US-ASCII"));
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
-                createMimeRecord("application/com.example.beamtest", bytes1),
-                createMimeRecord("application/com.example.beamtest", bytes2),
+                createMimeRecord("application/com.example.beamtest", bytes1)
         });
         return msg;
     }
@@ -84,11 +85,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            // Beam 受信
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra( NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage msg = (NdefMessage) rawMsgs[0];
-            String string1 = new String(msg.getRecords()[0].getPayload());
-            String string2 = new String(msg.getRecords()[1].getPayload());
+            String color = new String(msg.getRecords()[0].getPayload());
+            mColor += color;
+            this.updateColorText();
         }
+    }
+
+    /**
+     * mColor の値を set してから呼び出すと textView に反映する
+     */
+    private void updateColorText() {
+        TextView colorText = (TextView) findViewById(R.id.color_text);
+        colorText.setText(mColor);
     }
 
 
