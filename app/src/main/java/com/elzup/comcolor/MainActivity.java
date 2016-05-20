@@ -23,11 +23,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String mColor;
     NfcAdapter mNfcAdapter;
 
+    static final String PREFERENCE_KEY_COLOR = "color";
+    static final String PREFERENCE_NAME = "DataSave";
+
+    static final String NDEF_TYPE_FELLOW_PREFIX = "push:";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
-        mColor = data.getString("color", "none");
+        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+        mColor = data.getString(PREFERENCE_KEY_COLOR, "none");
         Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        byte[] bytes1 = ("push:" + mColor).getBytes(Charset.forName("US-ASCII"));
+        byte[] bytes1 = (NDEF_TYPE_FELLOW_PREFIX + mColor).getBytes(Charset.forName("US-ASCII"));
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.example.beamtest", bytes1)
         });
@@ -81,14 +86,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             byte[] payload = msg.getRecords()[0].getPayload();
 
             String colorStr = new String(payload);
-            if (colorStr.length() >= 5 && colorStr.substring(0, 5).equals("push:")) {
+            if (colorStr.length() >= 5 && colorStr.substring(0, 5).equals(NDEF_TYPE_FELLOW_PREFIX)) {
+                // 端末同士
                 mColor += colorStr.substring(5);
             } else {
+                // カードタグ
                 byte status = payload[0];
                 int languageCodeLength = status & 0x3F;
 //                    boolean encodeUtf8 = ((status & 0x80) == 0);
 //                    String textEncoding = encodeUtf8 ;
-               mColor += new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
+                mColor += new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
             }
             this.updateColorText();
         }
@@ -98,9 +105,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * mColor の値を set してから呼び出すと textView に反映する
      */
     private void updateColorText() {
-        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
-        editor.putString("color", mColor);
+        editor.putString(PREFERENCE_KEY_COLOR, mColor);
         editor.apply();
         TextView colorText = (TextView) findViewById(R.id.color_text);
         colorText.setText(mColor);
