@@ -1,4 +1,4 @@
-package com.elzup.comcolor;
+package com.elzup.comcolor.views.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,17 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.elzup.comcolor.R;
+import com.elzup.comcolor.util.ColorUtil;
+
 import java.nio.charset.Charset;
 
 import icepick.Icepick;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
-    // 保持する色, 今は String
-    String mColor;
+    int mColor;
     NfcAdapter mNfcAdapter;
 
-    static final String PREFERENCE_KEY_COLOR = "color";
+    static final String PREFERENCE_KEY_COLOR = "colorState";
     static final String PREFERENCE_NAME = "DataSave";
 
     static final String NDEF_TYPE_FELLOW_PREFIX = "push:";
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-        mColor = data.getString(PREFERENCE_KEY_COLOR, "none");
+        mColor = data.getInt(PREFERENCE_KEY_COLOR, 0);
         Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset_button:
-                String resetColor = "white";
+                int resetColor = 0xffffffff;
                 mColor = resetColor;
                 this.updateColorText();
                 break;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        byte[] bytes1 = (NDEF_TYPE_FELLOW_PREFIX + mColor).getBytes(Charset.forName("US-ASCII"));
+        byte[] bytes1 = (NDEF_TYPE_FELLOW_PREFIX + Integer.toHexString(mColor)).getBytes(Charset.forName("US-ASCII"));
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.example.beamtest", bytes1)
         });
@@ -86,17 +88,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             byte[] payload = msg.getRecords()[0].getPayload();
 
             String colorStr = new String(payload);
+            int newCol = 0x00000000;
             if (colorStr.length() >= 5 && colorStr.substring(0, 5).equals(NDEF_TYPE_FELLOW_PREFIX)) {
                 // 端末同士
-                mColor += colorStr.substring(5);
+                newCol = (int) Long.parseLong(colorStr.substring(5), 16);
             } else {
                 // カードタグ
                 byte status = payload[0];
                 int languageCodeLength = status & 0x3F;
 //                    boolean encodeUtf8 = ((status & 0x80) == 0);
 //                    String textEncoding = encodeUtf8 ;
-                mColor += new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
+                String hexColStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
+                newCol = (int) Long.parseLong(hexColStr, 16);
             }
+            mColor = ColorUtil.blend(mColor, newCol, 0.5f);
             this.updateColorText();
         }
     }
@@ -107,10 +112,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void updateColorText() {
         SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
-        editor.putString(PREFERENCE_KEY_COLOR, mColor);
+        editor.putInt(PREFERENCE_KEY_COLOR, mColor);
         editor.apply();
         TextView colorText = (TextView) findViewById(R.id.color_text);
-        colorText.setText(mColor);
+        colorText.setText(String.valueOf(this.mColor));
+        getWindow().getDecorView().setBackgroundColor(this.mColor);
     }
 
 
