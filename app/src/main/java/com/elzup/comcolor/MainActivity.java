@@ -31,30 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView text = (TextView) findViewById(R.id.nfcTextView);
-        //インテントの取得
-        Intent intent = getIntent();
-        //NDEF対応カードの検出か確認
-        String action = intent.getAction();
-
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-            Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            NdefMessage[] msgs = new NdefMessage[raws.length];
-
-            String message = "";
-            for (int i = 0; i < raws.length; i++) {
-                msgs[i] = (NdefMessage) raws[i];
-                for (NdefRecord record : msgs[i].getRecords()) {
-                    byte[] payload = record.getPayload();
-                    byte status = payload[0];
-                    int languageCodeLength = status & 0x3F;
-//                    boolean encodeUtf8 = ((status & 0x80) == 0);
-//                    String textEncoding = encodeUtf8 ;
-                    message = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
-                }
-            }
-            text.setText(message);
-        }
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mNfcAdapter.setNdefPushMessageCallback(this, this);
         this.updateColorText();
@@ -80,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        byte[] bytes1 = mColor.getBytes(Charset.forName("US-ASCII"));
+        byte[] bytes1 = ("push:" + mColor).getBytes(Charset.forName("US-ASCII"));
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.example.beamtest", bytes1)
         });
@@ -100,11 +76,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             // Beam 受信
-            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            NdefMessage msg = (NdefMessage) rawMsgs[0];
-            String color = new String(msg.getRecords()[0].getPayload());
+            Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            NdefMessage msg = (NdefMessage) raws[0];
+            byte[] payload = msg.getRecords()[0].getPayload();
 
-            mColor += color;
+            String colorStr = new String(payload);
+            if (colorStr.length() >= 5 && colorStr.substring(0, 5).equals("push:")) {
+                mColor += colorStr.substring(5);
+            } else {
+                byte status = payload[0];
+                int languageCodeLength = status & 0x3F;
+//                    boolean encodeUtf8 = ((status & 0x80) == 0);
+//                    String textEncoding = encodeUtf8 ;
+               mColor += new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
+            }
             this.updateColorText();
         }
     }
