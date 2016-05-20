@@ -1,6 +1,8 @@
 package com.elzup.comcolor;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -14,18 +16,18 @@ import android.widget.TextView;
 import java.nio.charset.Charset;
 
 import icepick.Icepick;
-import icepick.State;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
 
     // 保持する色, 今は String
-    @State
     String mColor;
     NfcAdapter mNfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+        mColor = data.getString("color", "none");
         Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage msg = (NdefMessage) rawMsgs[0];
             String color = new String(msg.getRecords()[0].getPayload());
+
             mColor += color;
             this.updateColorText();
         }
@@ -110,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * mColor の値を set してから呼び出すと textView に反映する
      */
     private void updateColorText() {
+        SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = data.edit();
+        editor.putString("color", mColor);
+        editor.apply();
         TextView colorText = (TextView) findViewById(R.id.color_text);
         colorText.setText(mColor);
     }
