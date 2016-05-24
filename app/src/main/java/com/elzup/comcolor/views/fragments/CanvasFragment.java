@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.models.StateService;
+import com.elzup.comcolor.util.ColorUtil;
 
 public class CanvasFragment extends Fragment {
     public static final String TAG = "CanvasFragment";
@@ -49,8 +50,19 @@ public class CanvasFragment extends Fragment {
 
     }
 
+    /**
+     * UserDefault に保存されている色に設定
+     */
     public void resyncColor() {
         this.updateColor(this.service.getColor());
+    }
+
+    /**
+     * 新しい半分の割合で色混ぜる
+     * @param color 新しい色
+     */
+    public void pushColor(int color) {
+        this.updateColor(ColorUtil.blend(mColor, color, 0.5f));
     }
 
     /**
