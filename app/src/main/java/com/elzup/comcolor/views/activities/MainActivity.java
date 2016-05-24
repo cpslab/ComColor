@@ -1,7 +1,6 @@
 package com.elzup.comcolor.views.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -9,75 +8,36 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.TextView;
 
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.models.StateService;
 import com.elzup.comcolor.util.ColorUtil;
+import com.elzup.comcolor.views.fragments.CanvasFragment;
 
 import java.nio.charset.Charset;
 
-import icepick.Icepick;
+public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
+    public static final String TAG = "MainActivity";
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NfcAdapter.CreateNdefMessageCallback {
-
-    int mColor;
     NfcAdapter mNfcAdapter;
-    StateService service;
-
+    CanvasFragment canvasFragment;
     static final String NDEF_TYPE_FELLOW_PREFIX = "push:";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.service = new StateService(this.getApplicationContext());
-        Icepick.restoreInstanceState(this, savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mNfcAdapter.setNdefPushMessageCallback(this, this);
-        this.updateColor(this.service.getColor());
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Icepick.saveInstanceState(this, outState);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.reset_button:
-                int resetColor = Color.WHITE;
-                this.updateColor(resetColor);
-                break;
-        }
-    }
-
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent event) {
-        // mColor (String) の送信
-        byte[] bytes1 = (NDEF_TYPE_FELLOW_PREFIX + Integer.toHexString(mColor)).getBytes(Charset.forName("US-ASCII"));
-        NdefMessage msg = new NdefMessage(new NdefRecord[]{
-                createMimeRecord("application/com.example.beamtest", bytes1)
-        });
-        return msg;
-    }
-
-    public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
-        byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
-        NdefRecord mimeRecord = new NdefRecord(
-                NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
-        return mimeRecord;
+        setContentView(R.layout.activity_main);
+        canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
 
     @Override
     public synchronized void onResume() {
         super.onResume();
-        this.updateColor(this.service.getColor());
-
+        if (canvasFragment == null) {
+            return;
+        }
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             // Beam 受信
@@ -93,24 +53,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // カードタグ
                 byte status = payload[0];
                 int languageCodeLength = status & 0x3F;
-//                    boolean encodeUtf8 = ((status & 0x80) == 0);
-//                    String textEncoding = encodeUtf8 ;
+                //                    boolean encodeUtf8 = ((status & 0x80) == 0);
+                //                    String textEncoding = encodeUtf8 ;
                 String hexColStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
                 newCol = (int) Long.parseLong(hexColStr, 16);
             }
-            this.updateColor(ColorUtil.blend(mColor, newCol, 0.5f));
+            canvasFragment.updateColor(ColorUtil.blend(canvasFragment.mColor, newCol, 0.5f));
         }
     }
 
-    /**
-     * mColor の値を set してから呼び出すと textView に反映する
-     */
-    private void updateColor(int color) {
-        this.mColor = color;
-        this.service.setColor(color);
-        TextView colorText = (TextView) findViewById(R.id.color_text);
-        colorText.setText(String.valueOf(this.mColor));
-        getWindow().getDecorView().setBackgroundColor(this.mColor);
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        // mColor (String) の送信
+        byte[] bytes1 = (NDEF_TYPE_FELLOW_PREFIX + Integer.toHexString(canvasFragment.mColor)).getBytes(Charset.forName("US-ASCII"));
+        NdefMessage msg = new NdefMessage(new NdefRecord[]{
+                createMimeRecord("application/com.example.beamtest", bytes1)
+        });
+        return msg;
+    }
+
+    public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
+        NdefRecord mimeRecord = new NdefRecord(
+                NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+        return mimeRecord;
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
 

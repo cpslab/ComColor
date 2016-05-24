@@ -9,28 +9,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".views.activities.MainActivity">
 
-    <TextView
+    <fragment
+        android:name="com.elzup.comcolor.views.fragments.CanvasFragment"
+        android:id="@+id/canvas_fragment"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/color_text"
-        android:text="none" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/reset_button"
-        android:text="reset"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="onClick"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         />
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/nfcTextView"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
 </RelativeLayout>
