@@ -34,6 +34,7 @@ public class CanvasFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_canvas, null);
         colorText = (TextView) v.findViewById(R.id.color_text);
         resetButton = (Button) v.findViewById(R.id.reset_button);
+        mColor = this.service.getColor();
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,9 +70,9 @@ public class CanvasFragment extends Fragment {
      * mColor の値を set してから呼び出すと textView に反映する
      */
     public void updateColor(int color) {
-        this.mColor = color;
-        this.service.setColor(color);
-        colorText.setText(String.valueOf(this.mColor));
-        getView().setBackgroundColor(this.mColor);
+        this.mColor = color | 0xff000000;
+        this.service.setColor(mColor);
+        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor)));
+        getView().setBackgroundColor(mColor);
     }
 }

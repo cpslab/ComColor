@@ -10,4 +10,16 @@ public class ColorUtil {
         float b = (Color.blue(color1) * ratio) + (Color.blue(color2) * inverseRation);
         return Color.rgb((int) r, (int) g, (int) b);
     }
+
+    /**
+     * color値 を読みやすい文字列のフォーマットで返す
+     * format: "#{hexRGBVal}({hexAlphaValue})"
+     * exsample: red -> #ff0000(00)
+     * @param color
+     * @return
+     */
+    public static String toHexRGBText(int color) {
+        String hexStr = Integer.toHexString(color);
+        return String.format("#%s(%s)", hexStr.substring(2), hexStr.substring(0, 2));
+    }
 }
