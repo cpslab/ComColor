@@ -1,8 +1,7 @@
 package com.elzup.comcolor.views.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.models.StateService;
 import com.elzup.comcolor.util.ColorUtil;
 
 import java.nio.charset.Charset;
@@ -24,23 +24,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     int mColor;
     NfcAdapter mNfcAdapter;
-
-    static final String PREFERENCE_KEY_COLOR = "colorState";
-    static final String PREFERENCE_NAME = "DataSave";
+    StateService service;
 
     static final String NDEF_TYPE_FELLOW_PREFIX = "push:";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-        mColor = data.getInt(PREFERENCE_KEY_COLOR, 0);
+        this.service = new StateService(this.getApplicationContext());
         Icepick.restoreInstanceState(this, savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         mNfcAdapter.setNdefPushMessageCallback(this, this);
-        this.updateColorText();
+        this.updateColor(this.service.getColor());
     }
 
     @Override
@@ -53,9 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.reset_button:
-                int resetColor = 0xffffffff;
-                mColor = resetColor;
-                this.updateColorText();
+                int resetColor = Color.WHITE;
+                this.updateColor(resetColor);
                 break;
         }
     }
@@ -80,9 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public synchronized void onResume() {
         super.onResume();
-        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-        mColor = data.getInt(PREFERENCE_KEY_COLOR, 0);
-        this.updateColorText();
+        this.updateColor(this.service.getColor());
 
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
@@ -104,19 +98,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String hexColStr = new String(payload, languageCodeLength + 1, payload.length - languageCodeLength - 1);
                 newCol = (int) Long.parseLong(hexColStr, 16);
             }
-            mColor = ColorUtil.blend(mColor, newCol, 0.5f);
-            this.updateColorText();
+            this.updateColor(ColorUtil.blend(mColor, newCol, 0.5f));
         }
     }
 
     /**
      * mColor の値を set してから呼び出すと textView に反映する
      */
-    private void updateColorText() {
-        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = data.edit();
-        editor.putInt(PREFERENCE_KEY_COLOR, mColor);
-        editor.apply();
+    private void updateColor(int color) {
+        this.mColor = color;
+        this.service.setColor(color);
         TextView colorText = (TextView) findViewById(R.id.color_text);
         colorText.setText(String.valueOf(this.mColor));
         getWindow().getDecorView().setBackgroundColor(this.mColor);
