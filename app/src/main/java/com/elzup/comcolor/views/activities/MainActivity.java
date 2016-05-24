@@ -80,13 +80,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public synchronized void onResume() {
         super.onResume();
+        SharedPreferences data = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+        mColor = data.getInt(PREFERENCE_KEY_COLOR, 0);
+        this.updateColorText();
+
         Intent intent = getIntent();
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             // Beam 受信
             Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             NdefMessage msg = (NdefMessage) raws[0];
             byte[] payload = msg.getRecords()[0].getPayload();
-
             String colorStr = new String(payload);
             int newCol = 0x00000000;
             if (colorStr.length() >= 5 && colorStr.substring(0, 5).equals(NDEF_TYPE_FELLOW_PREFIX)) {
