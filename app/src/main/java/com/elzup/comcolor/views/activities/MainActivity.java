@@ -1,6 +1,8 @@
 package com.elzup.comcolor.views.activities;
 
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -20,13 +22,23 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     NfcAdapter mNfcAdapter;
     CanvasFragment canvasFragment;
+    private PendingIntent mPendingIntent;
+    private IntentFilter[] mIntentFilters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        mNfcAdapter.setNdefPushMessageCallback(this, this);
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
+
+        Intent intent = new Intent(getApplicationContext(), getClass());
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+
+        IntentFilter tagIntentFilter = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        IntentFilter ndefIntentFilter = IntentFilter.create(NfcAdapter.ACTION_NDEF_DISCOVERED, "*/*");
+        mIntentFilters = new IntentFilter[]{ ndefIntentFilter };
+
         setContentView(R.layout.activity_main);
         canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
@@ -34,23 +46,36 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     public synchronized void onResume() {
         super.onResume();
-        if (canvasFragment == null) {
-            return;
-        }
-        Intent intent = getIntent();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            int recievedColor = NFCManager.parseColor(intent);
+        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, null);
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            int recievedColor = NFCManager.parseColor(getIntent());
             canvasFragment.pushColor(recievedColor);
         }
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        //foregrandDispathch無効
+        mNfcAdapter.disableForegroundDispatch(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+    }
+
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
         byte[] bytes1 = NFCManager.createPayload(canvasFragment.mColor);
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
-                createMimeRecord("application/com.example.beamtest", bytes1)
+                createMimeRecord("application/com.elzup.comcolor", bytes1)
+
         });
+        mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, null);
         return msg;
     }
 
