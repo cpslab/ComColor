@@ -1,7 +1,7 @@
 ComColor
 ===
 
-![ComColor app icon](https://raw.githubusercontent.com/elzup/ComColor/master/app/src/main/res/drawable-xxxhdpi/ic_launcher_comcolor.png) 
+![ComColor app icon](https://raw.githubusercontent.com/cpslab/ComColor/master/app/src/main/res/drawable-xxxhdpi/ic_launcher_comcolor.png) 
 
 **Interactive** x **Color** x **Art**
  
