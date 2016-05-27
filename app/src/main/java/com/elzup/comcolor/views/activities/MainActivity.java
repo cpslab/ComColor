@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
         Intent intent = new Intent(getApplicationContext(), getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+        mPendingIntent = createPendingIntent();
 
         IntentFilter tagIntentFilter = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter ndefIntentFilter = IntentFilter.create(NfcAdapter.ACTION_NDEF_DISCOVERED, "*/*");
@@ -47,10 +47,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public synchronized void onResume() {
         super.onResume();
         mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, null);
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            int recievedColor = NFCManager.parseColor(getIntent());
-            canvasFragment.pushColor(recievedColor);
-        }
     }
 
     @Override
@@ -64,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
+        int recievedColor = NFCManager.parseColor(getIntent());
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            canvasFragment.pushColor(recievedColor);
+        }
     }
 
 
@@ -84,6 +84,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         NdefRecord mimeRecord = new NdefRecord(
                 NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
         return mimeRecord;
+    }
+
+    private PendingIntent createPendingIntent() {
+        Intent i = new Intent(this, MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK); // 【5】
+        return PendingIntent.getActivity(this, 0, i, 0);
     }
 
 
