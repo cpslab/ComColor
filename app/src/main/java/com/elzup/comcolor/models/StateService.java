@@ -1,23 +1,34 @@
 package com.elzup.comcolor.models;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v4.graphics.ColorUtils;
 
-import com.elzup.comcolor.R;
-import com.elzup.comcolor.util.ColorUtil;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 public class StateService {
-    private Context context;
-    private SharedPreferences prefs;
 
     public StateService(Context context) {
-        this.context = context;
-        this.prefs = context.getSharedPreferences(statePreferencesKey(), Context.MODE_PRIVATE);
+        RealmConfiguration config = new RealmConfiguration.Builder(context)
+                .name("comcolor.realm")
+                .schemaVersion(1)
+                .modules(new ColorLogModule())
+                .build();
+        Realm.setDefaultConfiguration(config);
     }
 
     public int getColor() {
-        return prefs.getInt(colorKey(), 0);
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        RealmResults<ColorLogObject> res = realm.where(ColorLogObject.class).findAll();
+        if (res.size() == 0) {
+            int initColor = 0xffffffff;
+            setColor(initColor);
+            return initColor;
+        }
+        realm.commitTransaction();
+        return res.last().getColor();
     }
 
     public void addColor(int color) {
@@ -25,16 +36,11 @@ public class StateService {
     }
 
     public void setColor(int color) {
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(colorKey(), color);
-        editor.apply();
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        ColorLogObject colorLog = realm.createObject(ColorLogObject.class);
+        colorLog.setColor(color);
+        realm.commitTransaction();
     }
 
-    public String colorKey() {
-        return context.getResources().getString(R.string.prefs_key_color);
-    }
-
-    public String statePreferencesKey() {
-        return context.getResources().getString(R.string.prefs_state);
-    }
 }
