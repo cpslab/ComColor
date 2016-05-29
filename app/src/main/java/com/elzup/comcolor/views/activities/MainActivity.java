@@ -1,11 +1,17 @@
 package com.elzup.comcolor.views.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.nfc.NfcAdapter;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.models.NfcModel;
+import com.elzup.comcolor.models.StateService;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,8 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         this.nfc = new NfcModel(this);
-        this.nfc.ndefIntentCheck(getIntent());
-
+        this.colorSync();
         canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
 
@@ -40,8 +45,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        this.nfc.ndefIntentCheck(intent);
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            this.nfc.ndefIntentColorUpdate(intent);
+            this.colorSync();
+        }
     }
+
+    void colorSync() {
+        int color = new StateService(this).getColor();
+        // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
+    }
+
+    @SuppressWarnings("deprecation")
+    public Drawable getDrawableResource(int id){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            return getDrawable(id);
+        }
+        else{
+            return getResources().getDrawable(id);
+        }
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

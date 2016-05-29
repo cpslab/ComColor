@@ -3,6 +3,7 @@ package com.elzup.comcolor.manager;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.tech.NfcF;
 import android.os.Parcelable;
 import android.util.Log;
 
@@ -14,6 +15,7 @@ public class NFCManager {
 
     public static int parseColor(Intent intent) {
         Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        // NfcF.get((Tag) intent.getByteExtra())
         NdefMessage msg = (NdefMessage) raws[0];
         byte[] payload = msg.getRecords()[0].getPayload();
         String dataStr = new String(payload);

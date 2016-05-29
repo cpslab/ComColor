@@ -2,6 +2,7 @@ package com.elzup.comcolor.models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.graphics.ColorUtils;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.util.ColorUtil;
@@ -20,7 +21,7 @@ public class StateService {
     }
 
     public void addColor(int color) {
-        this.setColor(ColorUtil.blend(this.getColor(), color));
+        this.setColor(ColorUtils.blendARGB(this.getColor(), color, 0.5f));
     }
 
     public void setColor(int color) {
