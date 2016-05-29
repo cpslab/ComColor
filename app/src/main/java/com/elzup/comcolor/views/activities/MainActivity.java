@@ -1,14 +1,11 @@
 package com.elzup.comcolor.views.activities;
 
 import android.content.Intent;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.manager.NFCManager;
 import com.elzup.comcolor.models.NfcModel;
-import com.elzup.comcolor.models.StateService;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 
 public class MainActivity extends AppCompatActivity {
