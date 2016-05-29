@@ -43,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         this.nfc.ndefIntentCheck();
     }
 
-    public int getColor() {
-        return this.canvasFragment.mColor;
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

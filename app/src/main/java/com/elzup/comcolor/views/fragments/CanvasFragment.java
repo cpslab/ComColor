@@ -16,7 +16,7 @@ import com.elzup.comcolor.util.ColorUtil;
 public class CanvasFragment extends Fragment {
     public static final String TAG = "CanvasFragment";
 
-    public int mColor;
+    private int mColor;
     StateService service;
 
     TextView colorText;
