@@ -5,11 +5,10 @@ import android.support.v4.graphics.ColorUtils;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import io.realm.RealmResults;
 
-public class StateService {
+public class ColorLogService {
 
-    public StateService(Context context) {
+    public ColorLogService(Context context) {
         RealmConfiguration config = new RealmConfiguration.Builder(context)
                 .name("comcolor.realm")
                 .schemaVersion(1)
@@ -20,15 +19,15 @@ public class StateService {
 
     public int getColor() {
         Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        RealmResults<ColorLogObject> res = realm.where(ColorLogObject.class).findAll();
-        if (res.size() == 0) {
+        if (realm.where(ColorLogObject.class).count() == 0) {
             int initColor = 0xffffffff;
             setColor(initColor);
             return initColor;
         }
+        realm.beginTransaction();
+        ColorLogObject res = realm.where(ColorLogObject.class).findAll().last();
         realm.commitTransaction();
-        return res.last().getColor();
+        return res.getColor();
     }
 
     public void addColor(int color) {
@@ -40,6 +39,9 @@ public class StateService {
         realm.beginTransaction();
         ColorLogObject colorLog = realm.createObject(ColorLogObject.class);
         colorLog.setColor(color);
+        // while (realm.where(ColorLogObject.class).count() > 3) {
+        //     realm.where(ColorLogObject.class).findAll().first().deleteFromRealm();
+        // }
         realm.commitTransaction();
     }
 

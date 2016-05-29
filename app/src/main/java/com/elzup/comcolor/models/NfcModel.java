@@ -53,7 +53,7 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
 
     public void ndefIntentColorUpdate(Intent intent) {
         int recievedColor = NFCManager.parseColor(intent);
-        new StateService(mainActivity).addColor(recievedColor);
+        new ColorLogService(mainActivity).addColor(recievedColor);
         mainActivity.getFragmentManager().beginTransaction().replace(R.id.canvas_fragment, new CanvasFragment());
     }
 
@@ -61,7 +61,7 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        int color = new  StateService(mainActivity).getColor();
+        int color = new ColorLogService(mainActivity).getColor();
         byte[] bytes1 = NFCManager.createPayload(color);
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.elzup.comcolor", bytes1)

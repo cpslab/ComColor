@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.models.NfcModel;
-import com.elzup.comcolor.models.StateService;
+import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void colorSync() {
-        int color = new StateService(this).getColor();
+        int color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
     }
