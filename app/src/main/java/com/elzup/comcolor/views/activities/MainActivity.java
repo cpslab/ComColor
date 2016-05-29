@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         this.nfc = new NfcModel(this);
-        this.nfc.ndefIntentCheck();
+        this.nfc.ndefIntentCheck(getIntent());
 
         canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        this.nfc.ndefIntentCheck();
+        this.nfc.ndefIntentCheck(intent);
     }
 
     @Override

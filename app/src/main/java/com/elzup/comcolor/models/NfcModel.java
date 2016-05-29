@@ -51,9 +51,9 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
         return PendingIntent.getActivity(mainActivity, 0, i, 0);
     }
 
-    public void ndefIntentCheck() {
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(mainActivity.getIntent().getAction())) {
-            int recievedColor = NFCManager.parseColor(mainActivity.getIntent());
+    public void ndefIntentCheck(Intent intent) {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            int recievedColor = NFCManager.parseColor(intent);
             new StateService(mainActivity).addColor(recievedColor);
             mainActivity.getFragmentManager().beginTransaction().replace(R.id.canvas_fragment, new CanvasFragment());
         }
