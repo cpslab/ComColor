@@ -59,14 +59,6 @@ public class CanvasFragment extends Fragment {
     }
 
     /**
-     * 新しい半分の割合で色混ぜる
-     * @param color 新しい色
-     */
-    public void pushColor(int color) {
-        this.updateColor(ColorUtil.blend(mColor, color, 0.5f));
-    }
-
-    /**
      * mColor の値を set してから呼び出すと textView に反映する
      */
     public void updateColor(int color) {

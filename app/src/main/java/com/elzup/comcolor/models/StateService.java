@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.util.ColorUtil;
 
 public class StateService {
     private Context context;
@@ -16,6 +17,10 @@ public class StateService {
 
     public int getColor() {
         return prefs.getInt(colorKey(), 0);
+    }
+
+    public void addColor(int color) {
+        this.setColor(ColorUtil.blend(this.getColor(), color));
     }
 
     public void setColor(int color) {
