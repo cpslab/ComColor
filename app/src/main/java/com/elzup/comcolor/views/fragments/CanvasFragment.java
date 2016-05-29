@@ -10,14 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.models.StateService;
+import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.util.ColorUtil;
 
 public class CanvasFragment extends Fragment {
     public static final String TAG = "CanvasFragment";
 
     private int mColor;
-    StateService service;
+    ColorLogService service;
 
     TextView colorText;
     Button resetButton;
@@ -25,7 +25,7 @@ public class CanvasFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.service = new StateService(this.getActivity().getApplicationContext());
+        this.service = new ColorLogService(this.getActivity().getApplicationContext());
     }
 
     @Override

@@ -51,19 +51,17 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
         return PendingIntent.getActivity(mainActivity, 0, i, 0);
     }
 
-    public void ndefIntentCheck() {
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(mainActivity.getIntent().getAction())) {
-            int recievedColor = NFCManager.parseColor(mainActivity.getIntent());
-            new StateService(mainActivity).addColor(recievedColor);
-            mainActivity.getFragmentManager().beginTransaction().replace(R.id.canvas_fragment, new CanvasFragment());
-        }
+    public void ndefIntentColorUpdate(Intent intent) {
+        int recievedColor = NFCManager.parseColor(intent);
+        new ColorLogService(mainActivity).addColor(recievedColor);
+        mainActivity.getFragmentManager().beginTransaction().replace(R.id.canvas_fragment, new CanvasFragment());
     }
 
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        int color = new  StateService(mainActivity).getColor();
+        int color = new ColorLogService(mainActivity).getColor();
         byte[] bytes1 = NFCManager.createPayload(color);
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.elzup.comcolor", bytes1)

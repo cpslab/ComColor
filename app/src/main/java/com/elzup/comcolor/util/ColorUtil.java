@@ -1,22 +1,6 @@
 package com.elzup.comcolor.util;
 
-import android.graphics.Color;
-
 public class ColorUtil {
-
-    static final float DEFAULT_COLOR_RAITO = 0.5f;
-
-    public static int blend(int color1, int color2, float ratio) {
-        final float inverseRation = 1f - ratio;
-        float r = (Color.red(color1) * ratio) + (Color.red(color2) * inverseRation);
-        float g = (Color.green(color1) * ratio) + (Color.green(color2) * inverseRation);
-        float b = (Color.blue(color1) * ratio) + (Color.blue(color2) * inverseRation);
-        return Color.rgb((int) r, (int) g, (int) b);
-    }
-
-    public static int blend(int color1, int color2) {
-        return blend(color1, color2, DEFAULT_COLOR_RAITO);
-    }
 
     /**
      * color値 を読みやすい文字列のフォーマットで返す
