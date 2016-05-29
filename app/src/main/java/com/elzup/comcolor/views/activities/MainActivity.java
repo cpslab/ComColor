@@ -1,5 +1,7 @@
 package com.elzup.comcolor.views.activities;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.manager.NFCManager;
+import com.elzup.comcolor.models.StateService;
 import com.elzup.comcolor.util.ColorUtil;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         super.onCreate(savedInstanceState);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
 
         Intent intent = new Intent(getApplicationContext(), getClass());
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -37,14 +41,15 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
         IntentFilter tagIntentFilter = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter ndefIntentFilter = IntentFilter.create(NfcAdapter.ACTION_NDEF_DISCOVERED, "*/*");
-        mIntentFilters = new IntentFilter[]{ ndefIntentFilter };
+        mIntentFilters = new IntentFilter[]{ ndefIntentFilter, tagIntentFilter };
 
         setContentView(R.layout.activity_main);
+        this.ndefIntentCheck();
         canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
 
     @Override
-    public synchronized void onResume() {
+    public void onResume() {
         super.onResume();
         mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, null);
     }
@@ -60,9 +65,14 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        int recievedColor = NFCManager.parseColor(getIntent());
+        this.ndefIntentCheck();
+    }
+
+    protected void ndefIntentCheck() {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            canvasFragment.pushColor(recievedColor);
+            int recievedColor = NFCManager.parseColor(getIntent());
+            new StateService(this.getApplicationContext()).addColor(recievedColor);
+            getFragmentManager().beginTransaction().replace(R.id.canvas_fragment, new CanvasFragment());
         }
     }
 
