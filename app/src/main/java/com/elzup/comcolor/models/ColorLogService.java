@@ -3,12 +3,13 @@ package com.elzup.comcolor.models;
 import android.content.Context;
 import android.support.v4.graphics.ColorUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
-import io.realm.internal.async.QueryUpdateTask;
 
 public class ColorLogService {
 
@@ -19,6 +20,22 @@ public class ColorLogService {
                 .modules(new ColorLogModule())
                 .build();
         Realm.setDefaultConfiguration(config);
+    }
+
+    public List<ColorLogObject> getColorListPretty() {
+        // NOTE: UnsupportedOperation replace, RealmResult
+        List<ColorLogObject> colorList = new ArrayList<>();
+        colorList.addAll(this.getColorList());
+        // recent 順に反転と連続を取り除く
+        Collections.reverse(colorList);
+        List<ColorLogObject> colorListPretty = new ArrayList<>();
+        colorListPretty.add(colorList.remove(0));
+        for (ColorLogObject cl: colorList) {
+            if (colorListPretty.get(colorListPretty.size() - 1).getColor() != cl.getColor()) {
+                colorListPretty.add(cl);
+            }
+        }
+        return colorListPretty;
     }
 
     public List<ColorLogObject> getColorList() {

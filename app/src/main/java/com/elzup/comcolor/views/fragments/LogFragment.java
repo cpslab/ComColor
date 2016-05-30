@@ -28,7 +28,7 @@ public class LogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_log, null);
         recyclerView = (RecyclerView) v.findViewById(R.id.logs_recycler_view);
         ColorLogService service = new ColorLogService(this.getContext());
-        ColorLogAdapter adapter = new ColorLogAdapter(service.getColorList());
+        ColorLogAdapter adapter = new ColorLogAdapter(service.getColorListPretty());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return v;
