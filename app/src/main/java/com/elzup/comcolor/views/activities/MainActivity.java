@@ -6,28 +6,57 @@ import android.graphics.drawable.Drawable;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.models.ColorLogService;
+import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
+import com.elzup.comcolor.views.fragments.LogFragment;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
 
-    CanvasFragment canvasFragment;
     NfcModel nfc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.fragment_container, new CanvasFragment());
+        transaction.addToBackStack(null);
+        transaction.commit();
+
         this.nfc = new NfcModel(this);
         this.colorSync();
-        canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_hisotry:
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.fragment_container, new LogFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -58,11 +87,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("deprecation")
-    public Drawable getDrawableResource(int id){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+    public Drawable getDrawableResource(int id) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return getDrawable(id);
-        }
-        else{
+        } else {
             return getResources().getDrawable(id);
         }
     }

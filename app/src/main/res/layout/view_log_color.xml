@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/colorcode_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:shadowColor="@android:color/black"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="3.0"
+        android:text="#ffffff"
+        android:textColor="@android:color/white"
+        android:textSize="40dp" />
+
+</RelativeLayout>
