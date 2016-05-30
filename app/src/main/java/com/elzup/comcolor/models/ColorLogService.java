@@ -3,8 +3,12 @@ package com.elzup.comcolor.models;
 import android.content.Context;
 import android.support.v4.graphics.ColorUtils;
 
+import java.util.List;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
+import io.realm.internal.async.QueryUpdateTask;
 
 public class ColorLogService {
 
@@ -15,6 +19,14 @@ public class ColorLogService {
                 .modules(new ColorLogModule())
                 .build();
         Realm.setDefaultConfiguration(config);
+    }
+
+    public List<ColorLogObject> getColorList() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        RealmResults<ColorLogObject> res = realm.where(ColorLogObject.class).findAll();
+        realm.commitTransaction();
+        return res;
     }
 
     public int getColor() {
