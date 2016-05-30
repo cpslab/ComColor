@@ -6,28 +6,42 @@ import android.graphics.drawable.Drawable;
 import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.models.ColorLogService;
-import com.elzup.comcolor.views.fragments.CanvasFragment;
+import com.elzup.comcolor.models.NfcModel;
+import com.elzup.comcolor.views.fragments.LogFragment;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
 
-    CanvasFragment canvasFragment;
     NfcModel nfc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.fragment_container, new LogFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
+
         this.nfc = new NfcModel(this);
         this.colorSync();
-        canvasFragment = (CanvasFragment) getFragmentManager().findFragmentById(R.id.canvas_fragment);
     }
 
     @Override
