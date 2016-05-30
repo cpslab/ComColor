@@ -13,13 +13,12 @@
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary" />
 
-    <fragment
+
+    <LinearLayout
         android:id="@+id/fragment_container"
-        android:name="com.elzup.comcolor.views.fragments.CanvasFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        />
-
+        android:orientation="horizontal" />
 
 </RelativeLayout>
