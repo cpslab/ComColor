@@ -19,20 +19,22 @@ import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 import com.elzup.comcolor.views.fragments.LogFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     public static final String TAG = "MainActivity";
 
     NfcModel nfc;
+    MenuItem historyMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TONAOYA: 長くない？
         FragmentManager fm = getSupportFragmentManager();
+        fm.addOnBackStackChangedListener(this);
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.fragment_container, new CanvasFragment());
-        transaction.addToBackStack(null);
         transaction.commit();
 
         this.nfc = new NfcModel(this);
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        historyMenuItem = menu.findItem(R.id.action_hisotry);
         return true;
     }
 
@@ -102,4 +105,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackStackChanged() {
+        if (this.historyMenuItem == null) {
+            return;
+        }
+        switch (getSupportFragmentManager().getBackStackEntryCount()) {
+            case 0:
+                historyMenuItem.setVisible(true);
+                this.invalidateOptionsMenu();
+            case 1:
+                // log 画面ではアイテム非表示
+                historyMenuItem.setVisible(false);
+        }
+    }
 }

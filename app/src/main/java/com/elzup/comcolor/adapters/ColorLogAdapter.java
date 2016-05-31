@@ -15,6 +15,7 @@ public class ColorLogAdapter extends RecyclerView.Adapter<ColorLogAdapter.ViewHo
 
     private List<ColorLogObject> mDataset;
 
+    // TONAOYA: public で適切？
     public ColorLogAdapter(List<ColorLogObject> mDataset) {
         this.mDataset = mDataset;
     }
