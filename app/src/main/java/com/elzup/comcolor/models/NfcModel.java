@@ -7,9 +7,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.manager.NFCManager;
@@ -36,7 +34,7 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
 
         IntentFilter tagIntentFilter = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter ndefIntentFilter = IntentFilter.create(NfcAdapter.ACTION_NDEF_DISCOVERED, "*/*");
-        mIntentFilters = new IntentFilter[]{ ndefIntentFilter, tagIntentFilter };
+        mIntentFilters = new IntentFilter[]{ndefIntentFilter, tagIntentFilter};
     }
 
     public void setEnable() {
@@ -58,11 +56,7 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
         int recievedColor = NFCManager.parseColor(intent);
         new ColorLogService(mainActivity).addColor(recievedColor);
         FragmentManager fm = mainActivity.getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        Fragment canvasFragment = new CanvasFragment();
-        transaction.replace(R.id.fragment_container, canvasFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        fm.beginTransaction().replace(R.id.fragment_container, new CanvasFragment()).commit();
     }
 
 

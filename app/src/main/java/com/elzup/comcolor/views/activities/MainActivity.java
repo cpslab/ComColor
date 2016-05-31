@@ -1,5 +1,6 @@
 package com.elzup.comcolor.views.activities;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -7,7 +8,6 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -19,10 +19,11 @@ import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 import com.elzup.comcolor.views.fragments.LogFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     public static final String TAG = "MainActivity";
 
     NfcModel nfc;
+    MenuItem historyMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fragment_container, new CanvasFragment());
-        transaction.addToBackStack(null);
-        transaction.commit();
+        fm.addOnBackStackChangedListener(this);
+        fm.beginTransaction().replace(R.id.fragment_container, new CanvasFragment()).commit();
 
         this.nfc = new NfcModel(this);
         this.colorSync();
@@ -42,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        historyMenuItem = menu.findItem(R.id.action_hisotry);
         return true;
     }
 
@@ -50,10 +50,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_hisotry:
                 FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction transaction = fm.beginTransaction();
-                transaction.replace(R.id.fragment_container, new LogFragment());
-                transaction.addToBackStack(null);
-                transaction.commit();
+                fm.beginTransaction().replace(R.id.fragment_container, new LogFragment()).addToBackStack(null).commit();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -74,16 +71,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            // トップに戻る
+            fm.popBackStackImmediate();
+        }
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             this.nfc.ndefIntentColorUpdate(intent);
             this.colorSync();
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     void colorSync() {
         int color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
+        getWindow().setStatusBarColor(ColorUtils.blendARGB(color, 0xff000000, 0.6f));
     }
 
     @SuppressWarnings("deprecation")
@@ -102,4 +106,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackStackChanged() {
+        if (this.historyMenuItem == null) {
+            return;
+        }
+        switch (getSupportFragmentManager().getBackStackEntryCount()) {
+            case 0:
+                historyMenuItem.setVisible(true);
+                this.invalidateOptionsMenu();
+            case 1:
+                // log 画面ではアイテム非表示
+                historyMenuItem.setVisible(false);
+        }
+    }
 }
