@@ -77,6 +77,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            // トップに戻る
+            fm.popBackStackImmediate();
+        }
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
             this.nfc.ndefIntentColorUpdate(intent);
             this.colorSync();
