@@ -1,5 +1,6 @@
 package com.elzup.comcolor.views.activities;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -81,10 +82,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     void colorSync() {
         int color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
+        getWindow().setStatusBarColor(ColorUtils.blendARGB(color, 0xff000000, 0.6f));
     }
 
     @SuppressWarnings("deprecation")
