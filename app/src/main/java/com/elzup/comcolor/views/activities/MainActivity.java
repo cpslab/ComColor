@@ -7,7 +7,6 @@ import android.nfc.NfcAdapter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -30,12 +29,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // TONAOYA: 長くない？
         FragmentManager fm = getSupportFragmentManager();
         fm.addOnBackStackChangedListener(this);
-        FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.fragment_container, new CanvasFragment());
-        transaction.commit();
+        fm.beginTransaction().replace(R.id.fragment_container, new CanvasFragment()).commit();
 
         this.nfc = new NfcModel(this);
         this.colorSync();
@@ -53,10 +49,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         switch (item.getItemId()) {
             case R.id.action_hisotry:
                 FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction transaction = fm.beginTransaction();
-                transaction.replace(R.id.fragment_container, new LogFragment());
-                transaction.addToBackStack(null);
-                transaction.commit();
+                fm.beginTransaction().replace(R.id.fragment_container, new LogFragment()).addToBackStack(null).commit();
                 return true;
         }
         return super.onOptionsItemSelected(item);
