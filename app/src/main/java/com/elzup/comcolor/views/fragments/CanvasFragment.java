@@ -55,16 +55,22 @@ public class CanvasFragment extends Fragment {
      * UserDefault に保存されている色に設定
      */
     public void resyncColor() {
-        this.updateColor(this.service.getColor());
+        this.updateColor(this.service.getColor(), false);
     }
 
     /**
      * mColor の値を set してから呼び出すと textView に反映する
      */
-    public void updateColor(int color) {
+    public void updateColor(int color, boolean isLog) {
         this.mColor = color | 0xff000000;
-        this.service.setColor(mColor);
+        if (isLog) {
+            this.service.setColor(mColor);
+        }
         colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor)));
         getView().setBackgroundColor(mColor);
+    }
+
+    public void updateColor(int color) {
+        this.updateColor(color, true);
     }
 }
