@@ -37,13 +37,13 @@ public class CanvasFragment extends Fragment {
         wa = new WaveAnimationSurfaceView(getActivity());
         colorText = (TextView) v.findViewById(R.id.color_text);
         resetButton = (Button) v.findViewById(R.id.reset_button);
-        
         //        wa = (WaveAnimationSurfaceView) v.findViewById(R.id.wave_surfaceview);
         mColor = this.service.getColor();
+
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateColor(Color.WHITE);
+//                updateColor(Color.WHITE, Color.GRAY);
             }
         });
         return wa;
@@ -60,23 +60,7 @@ public class CanvasFragment extends Fragment {
      * UserDefault に保存されている色に設定
      */
     public void resyncColor() {
-        this.updateColor(this.service.getColor(), false);
-    }
-
-    /**
-     * mColor の値を set してから呼び出すと textView に反映する
-     */
-    public void updateColor(int color, boolean isLog) {
-        this.mColor = color | 0xff000000;
-        if (isLog) {
-            this.service.setColor(mColor);
-        }
+        this.mColor = this.service.getColor();
         colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor)));
-//        getView().setBackgroundColor(mColor);
-        wa.run();
-    }
-
-    public void updateColor(int color) {
-        this.updateColor(color, true);
     }
 }

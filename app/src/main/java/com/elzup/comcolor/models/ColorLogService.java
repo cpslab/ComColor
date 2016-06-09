@@ -30,7 +30,7 @@ public class ColorLogService {
         Collections.reverse(colorList);
         List<ColorLogObject> colorListPretty = new ArrayList<>();
         colorListPretty.add(colorList.remove(0));
-        for (ColorLogObject cl: colorList) {
+        for (ColorLogObject cl : colorList) {
             if (colorListPretty.get(colorListPretty.size() - 1).getColor() != cl.getColor()) {
                 colorListPretty.add(cl);
             }
@@ -50,7 +50,7 @@ public class ColorLogService {
         Realm realm = Realm.getDefaultInstance();
         if (realm.where(ColorLogObject.class).count() == 0) {
             int initColor = 0xffffffff;
-            setColor(initColor);
+            setColor(initColor, initColor);
             return initColor;
         }
         realm.beginTransaction();
@@ -60,14 +60,15 @@ public class ColorLogService {
     }
 
     public void addColor(int color) {
-        this.setColor(ColorUtils.blendARGB(this.getColor(), color, 0.5f));
+        this.setColor(ColorUtils.blendARGB(this.getColor(), color, 0.5f), color);
     }
 
-    public void setColor(int color) {
+    public void setColor(int color, int mergedColor) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         ColorLogObject colorLog = realm.createObject(ColorLogObject.class);
         colorLog.setColor(color);
+        colorLog.setMergedColor(mergedColor);
         // while (realm.where(ColorLogObject.class).count() > 3) {
         //     realm.where(ColorLogObject.class).findAll().first().deleteFromRealm();
         // }

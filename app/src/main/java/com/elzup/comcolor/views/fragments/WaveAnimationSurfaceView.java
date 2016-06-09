@@ -3,6 +3,7 @@ package com.elzup.comcolor.views.fragments;
 /**
  * Created by ren on 2016/06/08.
  */
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.util.ColorUtil;
 
 
 class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
@@ -72,6 +75,7 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
             int ch = t + (int) h;
             if (ch < -4 * bmp.getHeight()) {
                 ch = -4 * bmp.getHeight();
+                mIsAttached = false;
             }
             //pre-combination wave
             for (int i = 0; i < w; i += bmp.getWidth()) {
@@ -92,6 +96,7 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
             paint.setColor(Color.YELLOW);
             canvas.drawRect(rect2, paint);
             holder.unlockCanvasAndPost(canvas);
+
         }
     }
 
@@ -106,6 +111,4 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
         myCanvas.drawBitmap(mutableBitmap, 0, 0, pnt);
         return mutableBitmap;
     }
-
-
 }
