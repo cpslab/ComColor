@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +22,7 @@ public class CanvasFragment extends Fragment {
 
     TextView colorText;
     Button resetButton;
+    WaveAnimationSurfaceView wa;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,8 +34,11 @@ public class CanvasFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_canvas, null);
+        wa = new WaveAnimationSurfaceView(getActivity());
         colorText = (TextView) v.findViewById(R.id.color_text);
         resetButton = (Button) v.findViewById(R.id.reset_button);
+        
+        //        wa = (WaveAnimationSurfaceView) v.findViewById(R.id.wave_surfaceview);
         mColor = this.service.getColor();
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,7 +46,7 @@ public class CanvasFragment extends Fragment {
                 updateColor(Color.WHITE);
             }
         });
-        return v;
+        return wa;
     }
 
     @Override
@@ -67,7 +72,8 @@ public class CanvasFragment extends Fragment {
             this.service.setColor(mColor);
         }
         colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor)));
-        getView().setBackgroundColor(mColor);
+//        getView().setBackgroundColor(mColor);
+        wa.run();
     }
 
     public void updateColor(int color) {
