@@ -13,17 +13,10 @@ import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.v4.graphics.ColorUtils;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-
 import com.elzup.comcolor.R;
-import com.elzup.comcolor.util.ColorUtil;
+import com.elzup.comcolor.models.ColorLogObject;
 
 
 class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
@@ -38,10 +31,12 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private float w, h;
     private boolean mIsAttached;
     private Bitmap bmp = null, abmp = null;
+    private int color, mergedColor, preColor;
 
     public void surfaceCreated(SurfaceHolder holder) {
         mIsAttached = true;
         thread = new Thread(this);
+
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -56,6 +51,12 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
         thread = null;
     }
 
+    public void setColor(ColorLogObject mergedColor,ColorLogObject preColor) {
+        this.color = mergedColor.getColor();
+        this.mergedColor = mergedColor.getMergedColor();
+        this.preColor = preColor.getColor();
+    }
+
     public void run() {
         SurfaceHolder holder = getHolder();
         int t = 0;
@@ -63,7 +64,7 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
         abmp = BitmapFactory.decodeResource(getResources(), R.drawable.wave);
         while (mIsAttached) {
             Canvas canvas = holder.lockCanvas();
-            canvas.drawColor(Color.BLACK);
+            canvas.drawColor(preColor);
 
             if (t == 0) {
                 canvas.drawColor(Color.WHITE);
@@ -79,24 +80,23 @@ class WaveAnimationSurfaceView extends SurfaceView implements SurfaceHolder.Call
             }
             //pre-combination wave
             for (int i = 0; i < w; i += bmp.getWidth()) {
-                bmp = this.setColor(bmp, Color.GREEN);
+                bmp = this.setColor(bmp, mergedColor);
                 canvas.drawBitmap(bmp, i, ch, paint);
             }
             paint = new Paint();
             rect = new Rect(0, ch + bmp.getHeight(), (int) w, this.getHeight());
-            paint.setColor(Color.GREEN);
+            paint.setColor(mergedColor);
             canvas.drawRect(rect, paint);
 
             //combination wave
             for (int i = 0; i < w; i += bmp.getWidth()) {
-                abmp = this.setColor(abmp, Color.YELLOW);
+                abmp = this.setColor(abmp, color);
                 canvas.drawBitmap(abmp, i, ch + 2 * bmp.getHeight(), paint);
             }
             rect2 = new Rect(0, ch + 3 * bmp.getHeight(), (int) w, this.getHeight() - t);
-            paint.setColor(Color.YELLOW);
+            paint.setColor(color);
             canvas.drawRect(rect2, paint);
             holder.unlockCanvasAndPost(canvas);
-
         }
     }
 

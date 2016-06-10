@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.models.ColorLogObject;
 import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.models.NfcModel;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
@@ -84,10 +85,10 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     void colorSync() {
-        int color = new ColorLogService(this).getColor();
+        ColorLogObject color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
-        getWindow().setStatusBarColor(ColorUtils.blendARGB(color, 0xff000000, 0.6f));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.5f)));
+        getWindow().setStatusBarColor(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.6f));
     }
 
     @SuppressWarnings("deprecation")

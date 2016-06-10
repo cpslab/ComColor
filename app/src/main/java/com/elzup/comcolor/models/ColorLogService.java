@@ -1,6 +1,7 @@
 package com.elzup.comcolor.models;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.graphics.ColorUtils;
 
 import java.util.ArrayList;
@@ -20,6 +21,14 @@ public class ColorLogService {
                 .modules(new ColorLogModule())
                 .build();
         Realm.setDefaultConfiguration(config);
+        init();
+    }
+
+    private void init(){
+        Realm realm = Realm.getDefaultInstance();
+        if (realm.where(ColorLogObject.class).count() < 2) {
+            setColor(Color.WHITE,Color.WHITE);
+        }
     }
 
     public List<ColorLogObject> getColorListPretty() {
@@ -46,24 +55,22 @@ public class ColorLogService {
         return res;
     }
 
-    public int getColor() {
+    public ColorLogObject getColor() {
         Realm realm = Realm.getDefaultInstance();
-        if (realm.where(ColorLogObject.class).count() == 0) {
-            int initColor = 0xffffffff;
-            setColor(initColor, initColor);
-            return initColor;
-        }
-        realm.beginTransaction();
-        ColorLogObject res = realm.where(ColorLogObject.class).findAll().last();
-        realm.commitTransaction();
-        return res.getColor();
+        return realm.where(ColorLogObject.class).findAll().last();
+    }
+
+    public ColorLogObject getPreColor() {
+        Realm realm = Realm.getDefaultInstance();
+        long count = realm.where(ColorLogObject.class).count();
+        return realm.where(ColorLogObject.class).findAll().get((int)count - 2);
     }
 
     public void addColor(int color) {
-        this.setColor(ColorUtils.blendARGB(this.getColor(), color, 0.5f), color);
+        this.setColor(ColorUtils.blendARGB(this.getColor().getColor(), color, 0.5f), color);
     }
 
-    public void setColor(int color, int mergedColor) {
+    public ColorLogObject setColor(int color, int mergedColor) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         ColorLogObject colorLog = realm.createObject(ColorLogObject.class);
@@ -73,6 +80,7 @@ public class ColorLogService {
         //     realm.where(ColorLogObject.class).findAll().first().deleteFromRealm();
         // }
         realm.commitTransaction();
+        return colorLog;
     }
 
 }

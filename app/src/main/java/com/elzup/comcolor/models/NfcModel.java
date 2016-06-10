@@ -63,7 +63,7 @@ public class NfcModel implements NfcAdapter.CreateNdefMessageCallback {
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
         // mColor (String) の送信
-        int color = new ColorLogService(mainActivity).getColor();
+        int color = new ColorLogService(mainActivity).getColor().getColor();
         byte[] bytes1 = NFCManager.createPayload(color);
         NdefMessage msg = new NdefMessage(new NdefRecord[]{
                 createMimeRecord("application/com.elzup.comcolor", bytes1)

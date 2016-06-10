@@ -4,22 +4,19 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.models.ColorLogObject;
 import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.util.ColorUtil;
 
 public class CanvasFragment extends Fragment {
     public static final String TAG = "CanvasFragment";
-
-    private int mColor;
+    private ColorLogObject mColor, pColor;
     ColorLogService service;
-
     TextView colorText;
     Button resetButton;
     WaveAnimationSurfaceView wa;
@@ -37,15 +34,17 @@ public class CanvasFragment extends Fragment {
         wa = new WaveAnimationSurfaceView(getActivity());
         colorText = (TextView) v.findViewById(R.id.color_text);
         resetButton = (Button) v.findViewById(R.id.reset_button);
-        //        wa = (WaveAnimationSurfaceView) v.findViewById(R.id.wave_surfaceview);
         mColor = this.service.getColor();
-
+        pColor = this.service.getPreColor();
+//        v.setBackgroundColor(pColor.getColor());
+        wa.setColor(mColor,pColor);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                updateColor(Color.WHITE, Color.GRAY);
             }
         });
+        
         return wa;
     }
 
@@ -53,7 +52,6 @@ public class CanvasFragment extends Fragment {
     public void onResume() {
         super.onResume();
         resyncColor();
-
     }
 
     /**
@@ -61,6 +59,6 @@ public class CanvasFragment extends Fragment {
      */
     public void resyncColor() {
         this.mColor = this.service.getColor();
-        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor)));
+        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor.getMergedColor())));
     }
 }
