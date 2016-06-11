@@ -1,7 +1,5 @@
 package com.elzup.comcolor.models;
 
-import android.support.v4.graphics.ColorUtils;
-
 import com.elzup.comcolor.util.ColorUtil;
 
 import io.realm.RealmObject;

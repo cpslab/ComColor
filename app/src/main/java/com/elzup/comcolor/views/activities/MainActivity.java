@@ -2,6 +2,7 @@ package com.elzup.comcolor.views.activities;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.nfc.NfcAdapter;
@@ -22,14 +23,16 @@ import com.elzup.comcolor.views.fragments.LogFragment;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     public static final String TAG = "MainActivity";
-
     NfcModel nfc;
     MenuItem historyMenuItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getWindow().getDecorView().setBackgroundColor(new ColorLogService(this).getPreColor().getColor());
 
         FragmentManager fm = getSupportFragmentManager();
         fm.addOnBackStackChangedListener(this);
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.5f)));
         getWindow().setStatusBarColor(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.6f));
+        getWindow().getDecorView().setBackgroundColor(new ColorLogService(this).getPreColor().getColor());
     }
 
     @SuppressWarnings("deprecation")

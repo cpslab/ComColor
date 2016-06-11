@@ -24,10 +24,10 @@ public class ColorLogService {
         init();
     }
 
-    private void init(){
+    private void init() {
         Realm realm = Realm.getDefaultInstance();
         if (realm.where(ColorLogObject.class).count() < 2) {
-            setColor(Color.WHITE,Color.WHITE);
+            setColor(Color.WHITE, Color.WHITE);
         }
     }
 
@@ -63,7 +63,7 @@ public class ColorLogService {
     public ColorLogObject getPreColor() {
         Realm realm = Realm.getDefaultInstance();
         long count = realm.where(ColorLogObject.class).count();
-        return realm.where(ColorLogObject.class).findAll().get((int)count - 2);
+        return realm.where(ColorLogObject.class).findAll().get((int) count - 2);
     }
 
     public void addColor(int color) {

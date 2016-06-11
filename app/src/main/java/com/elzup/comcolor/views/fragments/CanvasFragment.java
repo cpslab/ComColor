@@ -1,13 +1,21 @@
 package com.elzup.comcolor.views.fragments;
 
+import android.animation.Animator;
+import android.annotation.TargetApi;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.elzup.comcolor.R;
 import com.elzup.comcolor.models.ColorLogObject;
 import com.elzup.comcolor.models.ColorLogService;
@@ -19,7 +27,7 @@ public class CanvasFragment extends Fragment {
     ColorLogService service;
     TextView colorText;
     Button resetButton;
-    WaveAnimationSurfaceView wa;
+    int count = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,22 +38,42 @@ public class CanvasFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_canvas, null);
-        wa = new WaveAnimationSurfaceView(getActivity());
-        colorText = (TextView) v.findViewById(R.id.color_text);
-        resetButton = (Button) v.findViewById(R.id.reset_button);
         mColor = this.service.getColor();
         pColor = this.service.getPreColor();
-//        v.setBackgroundColor(pColor.getColor());
-        wa.setColor(mColor,pColor);
+
+
+        View v = inflater.inflate(R.layout.fragment_canvas, null);
+        colorText = (TextView) v.findViewById(R.id.color_text);
+        resetButton = (Button) v.findViewById(R.id.reset_button);
+
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                updateColor(Color.WHITE, Color.GRAY);
+                v.setBackgroundColor(Color.WHITE);
             }
         });
-        
-        return wa;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            v.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    float finalRadius = (float) Math.hypot(v.getWidth(), v.getHeight());
+                    Animator anim = ViewAnimationUtils.createCircularReveal(v, v.getWidth(), v.getHeight(), 0, finalRadius);
+                    v.setBackgroundColor(mColor.getColor());
+                    anim.start();
+                }
+            });
+        }
+
+
+//        if (count < 2) {
+//            return wa;
+//        } else {
+//            v.setBackgroundColor(mColor.getColor());
+        return v;
+//        }
+
     }
 
     @Override
@@ -61,4 +89,5 @@ public class CanvasFragment extends Fragment {
         this.mColor = this.service.getColor();
         colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor.getMergedColor())));
     }
+
 }
