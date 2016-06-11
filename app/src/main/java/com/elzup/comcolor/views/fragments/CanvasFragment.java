@@ -27,7 +27,7 @@ public class CanvasFragment extends Fragment {
     ColorLogService service;
     TextView colorText;
     Button resetButton;
-    int count = 2;
+    int uColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,7 @@ public class CanvasFragment extends Fragment {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                v.setBackgroundColor(Color.WHITE);
+               updateColor(Color.WHITE);
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -88,6 +88,18 @@ public class CanvasFragment extends Fragment {
     public void resyncColor() {
         this.mColor = this.service.getColor();
         colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor.getMergedColor())));
+    }
+    public void updateColor(int color, boolean isLog) {
+        uColor = color | 0xff000000;
+        if (isLog) {
+            this.service.setColor(uColor,uColor);
+        }
+        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(uColor)));
+        getView().setBackgroundColor(uColor);
+    }
+
+    public void updateColor(int color) {
+        this.updateColor(color, true);
     }
 
 }
