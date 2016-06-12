@@ -37,4 +37,5 @@ public class NFCManager {
     public static boolean fromAndroidMessage(String dataStr) {
         return dataStr.length() >= 5 && dataStr.substring(0, 5).equals(NDEF_TYPE_FELLOW_PREFIX);
     }
+
 }
