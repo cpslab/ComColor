@@ -5,14 +5,11 @@ import android.annotation.TargetApi;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,11 +20,10 @@ import com.elzup.comcolor.util.ColorUtil;
 
 public class CanvasFragment extends Fragment {
     public static final String TAG = "CanvasFragment";
-    private ColorLogObject mColor, pColor;
+    private ColorLogObject color;
     ColorLogService service;
     TextView colorText;
     Button resetButton;
-    int uColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,9 +34,7 @@ public class CanvasFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mColor = this.service.getColor();
-        pColor = this.service.getPreColor();
-
+        color = this.service.getColor();
 
         View v = inflater.inflate(R.layout.fragment_canvas, null);
         colorText = (TextView) v.findViewById(R.id.color_text);
@@ -49,7 +43,7 @@ public class CanvasFragment extends Fragment {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               updateColor(Color.WHITE);
+                updateColor(Color.WHITE);
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -60,20 +54,12 @@ public class CanvasFragment extends Fragment {
                     v.removeOnLayoutChangeListener(this);
                     float finalRadius = (float) Math.hypot(v.getWidth(), v.getHeight());
                     Animator anim = ViewAnimationUtils.createCircularReveal(v, v.getWidth(), v.getHeight(), 0, finalRadius);
-                    v.setBackgroundColor(mColor.getColor());
+                    v.setBackgroundColor(color.getColor());
                     anim.start();
                 }
             });
         }
-
-
-//        if (count < 2) {
-//            return wa;
-//        } else {
-//            v.setBackgroundColor(mColor.getColor());
         return v;
-//        }
-
     }
 
     @Override
@@ -86,16 +72,17 @@ public class CanvasFragment extends Fragment {
      * UserDefault に保存されている色に設定
      */
     public void resyncColor() {
-        this.mColor = this.service.getColor();
-        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(mColor.getMergedColor())));
+        this.color = this.service.getColor();
+        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(color.getMergedColor())));
     }
+
     public void updateColor(int color, boolean isLog) {
-        uColor = color | 0xff000000;
+        color = color | ColorUtil.CLEAR_COLOR_FILTER;
         if (isLog) {
-            this.service.setColor(uColor,uColor);
+            this.service.setColor(color, color);
         }
-        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(uColor)));
-        getView().setBackgroundColor(uColor);
+        colorText.setText(String.valueOf(ColorUtil.toHexRGBText(color)));
+        getView().setBackgroundColor(color);
     }
 
     public void updateColor(int color) {

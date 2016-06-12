@@ -2,7 +2,6 @@ package com.elzup.comcolor.views.activities;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.nfc.NfcAdapter;
@@ -18,12 +17,13 @@ import com.elzup.comcolor.R;
 import com.elzup.comcolor.models.ColorLogObject;
 import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.models.NfcModel;
+import com.elzup.comcolor.util.ColorUtil;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 import com.elzup.comcolor.views.fragments.LogFragment;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     public static final String TAG = "MainActivity";
-    
+
     NfcModel nfc;
     MenuItem historyMenuItem;
 
@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     void colorSync() {
         ColorLogObject color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.5f)));
-        getWindow().setStatusBarColor(ColorUtils.blendARGB(color.getColor(), 0xff000000, 0.6f));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color.getColor(), ColorUtil.CLEAR_COLOR_FILTER, 0.5f)));
+        getWindow().setStatusBarColor(ColorUtils.blendARGB(color.getColor(), ColorUtil.CLEAR_COLOR_FILTER, 0.6f));
         getWindow().getDecorView().setBackgroundColor(new ColorLogService(this).getPreColor().getColor());
     }
 

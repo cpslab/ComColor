@@ -2,6 +2,7 @@ package com.elzup.comcolor.util;
 
 public class ColorUtil {
 
+    public static final int CLEAR_COLOR_FILTER = 0xff000000;
     /**
      * color値 を読みやすい文字列のフォーマットで返す
      * format: "#{hexRGBVal}({hexAlphaValue})"
