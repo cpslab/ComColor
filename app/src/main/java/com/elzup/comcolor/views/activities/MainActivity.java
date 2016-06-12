@@ -14,8 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.elzup.comcolor.R;
+import com.elzup.comcolor.models.ColorLogObject;
 import com.elzup.comcolor.models.ColorLogService;
 import com.elzup.comcolor.models.NfcModel;
+import com.elzup.comcolor.util.ColorUtil;
 import com.elzup.comcolor.views.fragments.CanvasFragment;
 import com.elzup.comcolor.views.fragments.LogFragment;
 
@@ -25,10 +27,13 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     NfcModel nfc;
     MenuItem historyMenuItem;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getWindow().getDecorView().setBackgroundColor(new ColorLogService(this).getPreColor().getColor());
 
         FragmentManager fm = getSupportFragmentManager();
         fm.addOnBackStackChangedListener(this);
@@ -84,10 +89,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     void colorSync() {
-        int color = new ColorLogService(this).getColor();
+        ColorLogObject color = new ColorLogService(this).getColor();
         // getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(color));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color, 0xff000000, 0.5f)));
-        getWindow().setStatusBarColor(ColorUtils.blendARGB(color, 0xff000000, 0.6f));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorUtils.blendARGB(color.getColor(), ColorUtil.CLEAR_COLOR_FILTER, 0.5f)));
+        getWindow().setStatusBarColor(ColorUtils.blendARGB(color.getColor(), ColorUtil.CLEAR_COLOR_FILTER, 0.6f));
+        getWindow().getDecorView().setBackgroundColor(new ColorLogService(this).getPreColor().getColor());
     }
 
     @SuppressWarnings("deprecation")
