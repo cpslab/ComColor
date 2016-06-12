@@ -39,7 +39,7 @@ public class ColorLogService {
         Collections.reverse(colorList);
         List<ColorLogObject> colorListPretty = new ArrayList<>();
         colorListPretty.add(colorList.remove(0));
-        for (ColorLogObject cl : colorList) {
+        for (ColorLogObject cl: colorList) {
             if (colorListPretty.get(colorListPretty.size() - 1).getColor() != cl.getColor()) {
                 colorListPretty.add(cl);
             }

@@ -23,6 +23,7 @@ import com.elzup.comcolor.views.fragments.LogFragment;
 
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
     public static final String TAG = "MainActivity";
+    
     NfcModel nfc;
     MenuItem historyMenuItem;
 
